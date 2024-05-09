@@ -1,0 +1,2312 @@
+File: app/app.component.html
+<ion-app>
+  <ion-router-outlet></ion-router-outlet>
+</ion-app>
+
+------------------------
+
+File: app/app.component.scss
+
+------------------------
+
+File: app/app.component.spec.ts
+import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  it('should create the app', () => {
+    TestBed.overrideComponent(AppComponent, {
+      add: {
+        imports: [RouterTestingModule]
+      }
+    });
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/app.component.ts
+import { Component, NgModule, OnInit } from '@angular/core';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { AngularFireModule } from '@angular/fire/compat';
+import {
+  AngularFireAuth,
+  AngularFireAuthModule,
+} from '@angular/fire/compat/auth';
+import { environment } from 'src/environments/environment';
+import { FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { provideFirebaseApp } from '@angular/fire/app';
+import { initializeApp } from 'firebase/app';
+import { AuthService } from './services/auth.service';
+import { DataService } from './services/data.service';
+import { ApiService } from './services/api.service';
+import { HttpClientModule } from '@angular/common/http';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  standalone: true,
+  imports: [
+    IonApp,
+    IonRouterOutlet,
+    AngularFireModule,
+    AngularFireAuthModule,
+    HttpClientModule,
+  ],
+  providers: [
+    AuthService,
+    AngularFireAuth,
+    DataService,
+    ApiService,
+    { provide: FIREBASE_OPTIONS, useValue: environment.firebaseConfig },
+  ],
+})
+export class AppComponent implements OnInit {
+  constructor() {}
+  ngOnInit(): void {
+    // AngularFireModule.initializeApp(environment.firebaseConfig);
+  }
+}
+
+------------------------
+
+File: app/app.module.ts
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AppComponent } from './app.component';
+import { AngularFireModule } from '@angular/fire/compat';
+import { environment } from 'src/environments/environment';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { RouteReuseStrategy } from '@angular/router';
+
+@NgModule({
+  // declarations: [AppComponent.],
+  id: 'app',
+  imports: [
+    CommonModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    IonicModule.forRoot(),
+    IonRouterOutlet,
+    AngularFireModule,
+    AngularFireAuthModule,
+  ],
+  // bootstrap: [AppComponent],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class AppModule {}
+
+------------------------
+
+File: app/app.routes.ts
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'landing',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tabs',
+    loadChildren: () => import('./tabs/tabs.routes').then((m) => m.routes),
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./pages/login/login.page').then((m) => m.LoginPage),
+  },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./pages/signup/signup.page').then((m) => m.SignupPage),
+  },
+  {
+    path: 'home',
+    loadComponent: () =>
+      import('./pages/home/home.page').then((m) => m.HomePage),
+  },
+  {
+    path: 'landing',
+    loadComponent: () =>
+      import('./pages/landing/landing.page').then((m) => m.LandingPage),
+  },
+];
+
+------------------------
+
+File: app/explore-container/explore-container.component.html
+<div id="container">
+  <strong>{{ name }}</strong>
+  <p>
+    Explore
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      href="https://ionicframework.com/docs/components"
+      >UI Components</a
+    >
+  </p>
+</div>
+
+------------------------
+
+File: app/explore-container/explore-container.component.scss
+#container {
+  text-align: center;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#container p {
+  font-size: 16px;
+  line-height: 22px;
+
+  color: #8c8c8c;
+
+  margin: 0;
+}
+
+#container a {
+  text-decoration: none;
+}
+------------------------
+
+File: app/explore-container/explore-container.component.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ExploreContainerComponent } from './explore-container.component';
+
+describe('ExploreContainerComponent', () => {
+  let component: ExploreContainerComponent;
+  let fixture: ComponentFixture<ExploreContainerComponent>;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(ExploreContainerComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/explore-container/explore-container.component.ts
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-explore-container',
+  templateUrl: './explore-container.component.html',
+  styleUrls: ['./explore-container.component.scss'],
+  standalone: true,
+})
+export class ExploreContainerComponent {
+  @Input() name?: string;
+}
+
+------------------------
+
+File: app/models/company.ts
+export interface Company {
+  name: string;
+  location: string;
+  salaryRange: {
+    min?: number;
+    max?: number;
+  };
+  profile?: string;
+}
+
+------------------------
+
+File: app/models/interview_schedule.ts
+import { InterviewSlot } from './interview_slot';
+
+export interface InterviewSchedule {
+  interviewId: number;
+  company: string; // Reference to the Company document
+  candidates: {
+    candidateId: string; // Reference to the User document
+    interviewSlot: InterviewSlot;
+  }[];
+}
+
+------------------------
+
+File: app/models/interview_slot.ts
+export interface InterviewSlot {
+  date: Date;
+  startTime: string;
+  endTime: string;
+}
+
+------------------------
+
+File: app/models/job.ts
+export interface Job {
+  company: string; // Reference to the Company document
+  title: string;
+  description: string;
+  requirements: string[];
+  skills: string[];
+  type: 'Full-time' | 'Part-time' | 'Internship';
+  location: string;
+  salaryRange: {
+    min?: number;
+    max?: number;
+  };
+  postedAt?: Date;
+  applicationDeadline: Date;
+  isActive?: boolean;
+  minimumCGPA?: number;
+  maximumBacklogs?: number;
+  eligibleDepartments?: string[];
+}
+
+------------------------
+
+File: app/models/user.ts
+export interface User {
+  name: string;
+  email: string;
+  contact: string;
+  rollNumber: string;
+  password: string;
+  hsc: {
+    college: string;
+    yearOfPassing: number;
+    totalMarks: number;
+    outOfMarks: number;
+  };
+  ssc: {
+    college: string;
+    yearOfPassing: number;
+    totalMarks: number;
+    outOfMarks: number;
+  };
+  semesterMarks: {
+    number: number;
+    cgpa: number;
+    percentage: number;
+  }[];
+  resume?: string; // Path to the resume file
+  additionalCourses: string;
+}
+
+------------------------
+
+File: app/pages/home/home.page.html
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>home</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">home</ion-title>
+    </ion-toolbar>
+  </ion-header>
+</ion-content>
+
+------------------------
+
+File: app/pages/home/home.page.scss
+
+------------------------
+
+File: app/pages/home/home.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HomePage } from './home.page';
+
+describe('HomePage', () => {
+  let component: HomePage;
+  let fixture: ComponentFixture<HomePage>;
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(HomePage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/pages/home/home.page.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { AuthService } from 'src/app/services/auth.service';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
+})
+export class HomePage implements OnInit {
+  constructor(public auth: AuthService) {}
+
+  ngOnInit() {
+    console.log(this.auth.user?.email);
+  }
+}
+
+------------------------
+
+File: app/pages/landing/landing.page.html
+<ion-header>
+
+</ion-header>
+
+<ion-content class="ion-padding ion-text-center">
+  <img src="../../assets/icon/favicon.png" class="logo" />
+
+  <div class="title">
+    <h2>Welcome</h2>
+    <p>THE TPO APPLICATION</p>
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="routeToRoute('/login')">
+      <ion-icon name="chevron-forward"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+------------------------
+
+File: app/pages/landing/landing.page.scss
+.logo {
+    width: 50%;
+    margin: 20% 0 20% 0;
+}
+
+.title {
+    margin-bottom: 30px;
+}
+
+.title p {
+    margin-top: 0 !important;
+}
+------------------------
+
+File: app/pages/landing/landing.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LandingPage } from './landing.page';
+
+describe('LandingPage', () => {
+  let component: LandingPage;
+  let fixture: ComponentFixture<LandingPage>;
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LandingPage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/pages/landing/landing.page.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { chevronForward } from 'ionicons/icons';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-landing',
+  templateUrl: './landing.page.html',
+  styleUrls: ['./landing.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
+})
+export class LandingPage implements OnInit {
+  constructor(public router: Router) {
+    addIcons({ chevronForward });
+  }
+
+  routeToRoute(route: string): void {
+    this.router.navigateByUrl(route);
+  }
+
+  ngOnInit() {}
+}
+
+------------------------
+
+File: app/pages/login/login.page.html
+<ion-content [fullscreen]="true">
+
+  <!-- Login Page -->
+  <div class="container" *ngIf="screen == 'signin'">
+    <h1 class="heading">👋 Welcome Back<br><br></h1>
+    <p class="para">Sign in to continue!</p>
+    <!-- <form> -->
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Email Id</legend>
+        <ion-input [(ngModel)]="email" type="email" placeholder="name@domain.com"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Password</legend>
+        <ion-input type="password" [(ngModel)]="password" placeholder="*******"></ion-input>
+      </fieldset>
+    </ion-item>
+    <p class="forget-text"><a (click)="change('forget')">Forgot Password?</a></p>
+    <p class="signup-text">I'm a new user&nbsp;<a (click)="change('signup')">Sign Up?</a></p>
+    <ion-button class="login-button" (click)="login()" expand="block">Login</ion-button>
+    <ion-button class="google-button" expand="block" color="light"><ion-icon
+        name="logo-google"></ion-icon>&nbsp;&nbsp;Google Signin</ion-button>
+    <!-- </form> -->
+  </div>
+
+  <!-- Sign up page -->
+  <!-- Sign up page -->
+  <div class="container" *ngIf="screen == 'signup'">
+    <h1 class="heading">🚀 Create Account<br><br></h1>
+    <p class="para">Sign up to get started!</p>
+    <!-- <form> -->
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Full Name</legend>
+        <ion-input [(ngModel)]="name" type="text" placeholder="John Doe"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Email Id</legend>
+        <ion-input [(ngModel)]="email" type="email" placeholder="john@doe.com"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Password</legend>
+        <ion-input type="password" [(ngModel)]="password" placeholder="*******"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Contact Number</legend>
+        <ion-input [(ngModel)]="contact" type="tel" placeholder="Enter your contact number"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Roll Number</legend>
+        <ion-input [(ngModel)]="rollNumber" type="text" placeholder="Enter your roll number"></ion-input>
+      </fieldset>
+    </ion-item>
+    <!-- High School Details -->
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>High School College</legend>
+        <ion-input [(ngModel)]="hscCollege" type="text" placeholder="Enter your high school college"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Year of Passing (High School)</legend>
+        <ion-input [(ngModel)]="hscYearOfPassing" type="number" placeholder="Enter your year of passing"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Total Marks (High School)</legend>
+        <ion-input [(ngModel)]="hscTotalMarks" type="number" placeholder="Enter total marks"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Out of Marks (High School)</legend>
+        <ion-input [(ngModel)]="hscOutOfMarks" type="number" placeholder="Enter out of marks"></ion-input>
+      </fieldset>
+    </ion-item>
+    <!-- Secondary School Details -->
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Secondary School College</legend>
+        <ion-input [(ngModel)]="sscCollege" type="text" placeholder="Enter your secondary school college"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Year of Passing (Secondary School)</legend>
+        <ion-input [(ngModel)]="sscYearOfPassing" type="number" placeholder="Enter your year of passing"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Total Marks (Secondary School)</legend>
+        <ion-input [(ngModel)]="sscTotalMarks" type="number" placeholder="Enter total marks"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Out of Marks (Secondary School)</legend>
+        <ion-input [(ngModel)]="sscOutOfMarks" type="number" placeholder="Enter out of marks"></ion-input>
+      </fieldset>
+    </ion-item>
+    <!-- Semester Marks -->
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Semester Number</legend>
+        <ion-input [(ngModel)]="semesterNumber" type="number" placeholder="Enter semester number"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>CGPA</legend>
+        <ion-input [(ngModel)]="cgpa" type="number" placeholder="Enter CGPA"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Percentage</legend>
+        <ion-input [(ngModel)]="percentage" type="number" placeholder="Enter percentage"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Path to Resume</legend>
+        <ion-input [(ngModel)]="resume" type="text" placeholder="Enter path to resume file"></ion-input>
+      </fieldset>
+    </ion-item>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Additional Courses</legend>
+        <ion-input [(ngModel)]="additionalCourses" type="text" placeholder="Enter additional courses"></ion-input>
+      </fieldset>
+    </ion-item>
+    <p class="signup-text">I'm already a member&nbsp;<a (click)="change('signin')">Sign In?</a></p>
+    <ion-button class="login-button" (click)="register()" expand="block">Sign Up</ion-button>
+    <ion-button class="google-button" expand="block" color="light"><ion-icon
+        name="logo-google"></ion-icon>&nbsp;&nbsp;Google Signin</ion-button>
+    <!-- </form> -->
+  </div>
+
+  <!-- Forget password page -->
+  <div class="container" *ngIf="screen == 'forget'">
+    <h1 class="heading">Forget Password?<br><br></h1>
+    <p class="para">Enter email to reset</p>
+    <ion-item lines="none" class="ion-item">
+      <fieldset class="input-item">
+        <legend>Email Id</legend>
+        <ion-input [(ngModel)]="email" type="email" placeholder="name@domain.com"></ion-input>
+      </fieldset>
+    </ion-item>
+    <p class="signup-text">Rememberd Password&nbsp;<a (click)="change('signin')">Sign In?</a></p>
+    <ion-button class="login-button" expand="block">Reset Password</ion-button>
+  </div>
+
+
+</ion-content>
+------------------------
+
+File: app/pages/login/login.page.scss
+// Colors
+$primary-color: black; // Hot Pink
+$secondary-color: #f86429; // Coral
+$text-color: black; // Purple
+
+ion-content {
+    --background: repeating-linear-gradient(45deg, $primary-color, $primary-color 10px, $secondary-color 10px, $secondary-color 20px);
+}
+
+.container {
+    padding: 20px;
+    height: auto;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 5px solid $text-color;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.heading {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 36px;
+    color: $text-color;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.para {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 24px;
+    color: $text-color;
+}
+
+.ion-item {
+    --background: transparent;
+    --border-color: $primary-color;
+    --color: $text-color;
+    color: #f86429;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.input-item {
+    border: 2px solid $primary-color;
+    border-radius: 10px;
+    padding: 5px 10px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+legend {
+    font-size: 14px;
+    color: $text-color;
+}
+
+a {
+    color: $secondary-color;
+    text-decoration: underline;
+}
+
+.forget-text,
+.signup-text {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 14px;
+    color: $text-color;
+}
+
+.login-button {
+    --background: $primary-color;
+    --color: white;
+    --border-radius: 20px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.google-button {
+    --background: white;
+    --color: $text-color;
+    --border-color: $primary-color;
+    --border-style: solid;
+    --border-width: 2px;
+    --border-radius: 20px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 18px;
+    margin-top: 10px;
+}
+------------------------
+
+File: app/pages/login/login.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LoginPage } from './login.page';
+
+describe('LoginPage', () => {
+  let component: LoginPage;
+  let fixture: ComponentFixture<LoginPage>;
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LoginPage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/pages/login/login.page.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  Validators,
+} from '@angular/forms';
+import { User } from 'src/app/models/user';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { IonicModule, LoadingController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import { ApiService } from 'src/app/services/api.service';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.page.html',
+  styleUrls: ['./login.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
+})
+export class LoginPage implements OnInit {
+  screen: any = 'signin';
+  formData: FormGroup;
+  name: string = '';
+  email: string = '';
+  password: string = '';
+  contact: string = '';
+  rollNumber: string = '';
+  hscCollege: string = '';
+  hscYearOfPassing: number | undefined;
+  hscTotalMarks: number | undefined;
+  hscOutOfMarks: number | undefined;
+  sscCollege: string = '';
+  sscYearOfPassing: number | undefined;
+  sscTotalMarks: number | undefined;
+  sscOutOfMarks: number | undefined;
+  semesterNumber: number | undefined;
+  cgpa: number | undefined;
+  percentage: number | undefined;
+  resume: string = '';
+  additionalCourses: string = '';
+  isLoading: boolean = false;
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private api: ApiService,
+    public loadingController: LoadingController,
+    public router: Router
+  ) {
+    this.formData = this.fb.group({
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
+  }
+
+  ngOnInit() {
+    console.log(this.auth.user?.email);
+    if (this.auth.user?.email != undefined) {
+      this.router.navigate(['/tabs/tab1']);
+    }
+  }
+
+  change(event: any) {
+    this.screen = event;
+  }
+
+  async login() {
+    // var formData: any = new FormData();
+    // if (this.formData.valid) {
+    //   this.isLoading = true;
+    //   formData.append('email', this.formData.get('email')?.value);
+    //   formData.append('password', this.formData.get('password')?.value);
+    //   console.log(this.formData);
+    //   // this.auth.userLogin(formData).subscribe((data: any) => {
+    //   //   console.log(data);
+    //   // });
+    // }
+    const loading = await this.loadingController.create();
+    await loading.present();
+    var user: any;
+    try {
+      user = await this.auth.login(this.email, this.password);
+    } catch (err) {
+      console.log(err);
+    }
+
+    loading.dismiss();
+  }
+
+  async register() {
+    // var formData: any = new FormData();
+    // if (this.formData.valid) {
+    //   this.isLoading = true;
+    //   formData.append('name', this.formData.get('name')?.value);
+    //   formData.append('email', this.formData.get('email')?.value);
+    //   formData.append('password', this.formData.get('password')?.value);
+    //   console.log(this.formData);
+    //   // this.auth.userRegister(formData).subscribe((data: any) => {
+    //   //   console.log(data);
+    //   // });
+    // }
+    const loading = await this.loadingController.create();
+    await loading.present();
+    const user1: User = {
+      name: this.name,
+      email: this.email,
+      contact: this.contact,
+      rollNumber: this.rollNumber,
+      password: this.password,
+      hsc: {
+        college: this.hscCollege,
+        yearOfPassing: this.hscYearOfPassing!,
+        totalMarks: this.hscTotalMarks!,
+        outOfMarks: this.hscOutOfMarks!,
+      },
+      ssc: {
+        college: this.sscCollege,
+        yearOfPassing: this.sscYearOfPassing!,
+        totalMarks: this.sscTotalMarks!,
+        outOfMarks: this.sscOutOfMarks!,
+      },
+      semesterMarks: [
+        {
+          number: this.semesterNumber!,
+          cgpa: this.cgpa!,
+          percentage: this.percentage!,
+        },
+      ],
+      additionalCourses: this.additionalCourses,
+      resume: this.resume,
+    };
+    await this.api.register(user1);
+
+    loading.dismiss();
+  }
+}
+
+------------------------
+
+File: app/pages/signup/signup.page.html
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>signup</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">signup</ion-title>
+    </ion-toolbar>
+  </ion-header>
+</ion-content>
+
+------------------------
+
+File: app/pages/signup/signup.page.scss
+
+------------------------
+
+File: app/pages/signup/signup.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SignupPage } from './signup.page';
+
+describe('SignupPage', () => {
+  let component: SignupPage;
+  let fixture: ComponentFixture<SignupPage>;
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SignupPage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/pages/signup/signup.page.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+
+@Component({
+  selector: 'app-signup',
+  templateUrl: './signup.page.html',
+  styleUrls: ['./signup.page.scss'],
+  standalone: true,
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+})
+export class SignupPage implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+------------------------
+
+File: app/services/api.service.spec.ts
+import { TestBed } from '@angular/core/testing';
+
+import { ApiService } from './api.service';
+
+describe('ApiService', () => {
+  let service: ApiService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(ApiService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/services/api.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { User } from '../models/user';
+import { Company } from '../models/company';
+import { Job } from '../models/job';
+import { InterviewSchedule } from '../models/interview_schedule';
+import firebase from 'firebase/compat/app';
+import { ToastController } from '@ionic/angular';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { FirebaseError } from 'firebase/app';
+import { Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ApiService {
+  private baseUrl = 'http://localhost:3000/api'; // Replace with your API base URL
+
+  public user: User | undefined;
+  constructor(
+    public ngFireAuth: AngularFireAuth,
+    public toastController: ToastController,
+    public router: Router,
+    private http: HttpClient
+  ) {}
+  async register(userData: User) {
+    return await this.ngFireAuth
+      .createUserWithEmailAndPassword(userData.email, userData.password)
+      .catch((err) => {
+        this.presentAlert(err);
+      })
+      .then(async () => {
+        this.user = userData;
+        console.log(userData);
+
+        await this.registerUser(this.user).subscribe(
+          async (data) => {
+            console.log(data);
+            this.router.navigate(['/tabs/tab1']);
+            await this.presentAlert('Welcome ' + data.name);
+          },
+          (err) => {
+            console.log(err);
+          }
+        );
+      });
+  }
+  async presentAlert(reason: any) {
+    const alert = await this.toastController.create({
+      message: reason,
+      duration: 3000,
+    });
+    await alert.present();
+  }
+  async login(email: string, password: string) {
+    return await this.ngFireAuth
+      .signInWithEmailAndPassword(email, password)
+      .catch((err: FirebaseError) => {
+        this.presentAlert(err.message);
+      })
+      .then(async () => {
+        this.getUserByEmail(email).subscribe((user) => {
+          this.user = user;
+          this.router.navigate(['/tabs/tab1']);
+        });
+      });
+  }
+  async logout() {
+    return await this.ngFireAuth.signOut();
+  }
+  async getCurrentUser() {
+    return await this.ngFireAuth.currentUser;
+  }
+  async sendPasswordResetEmail(email: string) {
+    return await this.ngFireAuth.sendPasswordResetEmail(email);
+  }
+  // User routes
+  registerUser(user: User): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/users/register`, user);
+  }
+
+  getUserByEmail(email: string): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/users/email/${email}`);
+  }
+
+  updateUserByEmail(
+    email: string,
+    updatedData: Partial<User>
+  ): Observable<User> {
+    return this.http.put<User>(
+      `${this.baseUrl}/users/email/${email}`,
+      updatedData
+    );
+  }
+
+  deleteUserByEmail(email: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/users/email/${email}`);
+  }
+
+  // Company routes
+  addCompany(company: Company): Observable<Company> {
+    return this.http.post<Company>(`${this.baseUrl}/companies/add`, company);
+  }
+
+  getAllCompanies(): Observable<Company[]> {
+    return this.http.get<Company[]>(`${this.baseUrl}/companies/fetch`);
+  }
+
+  getCompanyById(id: string): Observable<Company> {
+    return this.http.get<Company>(`${this.baseUrl}/companies/fetch/${id}`);
+  }
+
+  updateCompany(
+    id: string,
+    updatedData: Partial<Company>
+  ): Observable<Company> {
+    return this.http.put<Company>(
+      `${this.baseUrl}/companies/update/${id}`,
+      updatedData
+    );
+  }
+
+  deleteCompany(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/companies/delete/${id}`);
+  }
+
+  // Job routes
+  addJob(job: Job): Observable<Job> {
+    return this.http.post<Job>(`${this.baseUrl}/jobs/add`, job);
+  }
+
+  getAllJobs(): Observable<Job[]> {
+    return this.http.get<Job[]>(`${this.baseUrl}/jobs/fetch`);
+  }
+
+  getJobById(id: string): Observable<Job> {
+    return this.http.get<Job>(`${this.baseUrl}/jobs/fetch/${id}`);
+  }
+
+  updateJob(id: string, updatedData: Partial<Job>): Observable<Job> {
+    return this.http.put<Job>(`${this.baseUrl}/jobs/update/${id}`, updatedData);
+  }
+
+  deleteJob(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/jobs/delete/${id}`);
+  }
+
+  // Interview Schedule routes
+  scheduleInterview(
+    interview: InterviewSchedule
+  ): Observable<InterviewSchedule> {
+    return this.http.post<InterviewSchedule>(
+      `${this.baseUrl}/interviews/`,
+      interview
+    );
+  }
+
+  getAllInterviews(): Observable<InterviewSchedule[]> {
+    return this.http.get<InterviewSchedule[]>(
+      `${this.baseUrl}/interviews/fetch`
+    );
+  }
+
+  getInterviewById(id: string): Observable<InterviewSchedule> {
+    return this.http.get<InterviewSchedule>(
+      `${this.baseUrl}/interviews/fetch/${id}`
+    );
+  }
+
+  updateInterview(
+    id: string,
+    updatedData: Partial<InterviewSchedule>
+  ): Observable<InterviewSchedule> {
+    return this.http.put<InterviewSchedule>(
+      `${this.baseUrl}/interviews/update/${id}`,
+      updatedData
+    );
+  }
+
+  cancelInterview(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/interviews/delete/${id}`);
+  }
+}
+
+------------------------
+
+File: app/services/auth.service.spec.ts
+import { TestBed } from '@angular/core/testing';
+
+import { AuthService } from './auth.service';
+
+describe('AuthService', () => {
+  let service: AuthService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(AuthService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/services/auth.service.ts
+import { Injectable } from '@angular/core';
+import firebase from 'firebase/compat/app';
+import { ToastController } from '@ionic/angular';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { FirebaseError } from 'firebase/app';
+import { Router } from '@angular/router';
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  public user: firebase.User | undefined;
+  constructor(
+    public ngFireAuth: AngularFireAuth,
+    public toastController: ToastController,
+    public router: Router
+  ) {}
+  async register(email: string, password: string) {
+    return await this.ngFireAuth
+      .createUserWithEmailAndPassword(email, password)
+      .catch((err) => {
+        this.presentAlert(err);
+      })
+      .then(() => {
+        this.ngFireAuth.authState.subscribe((user) => {
+          if (user) {
+            this.user = user;
+            this.router.navigate(['/tabs/tab1']);
+          }
+        });
+      });
+  }
+  async presentAlert(reason: any) {
+    const alert = await this.toastController.create({
+      message: reason,
+      duration: 3000,
+    });
+    await alert.present();
+  }
+  async login(email: string, password: string) {
+    return await this.ngFireAuth
+      .signInWithEmailAndPassword(email, password)
+      .catch((err: FirebaseError) => {
+        this.presentAlert(err.message);
+      })
+      .then(() => {
+        this.ngFireAuth.authState.subscribe((user) => {
+          if (user) {
+            this.user = user;
+            this.router.navigate(['/tabs/tab1']);
+          }
+        });
+      });
+  }
+  async logout() {
+    return await this.ngFireAuth.signOut();
+  }
+  async getCurrentUser() {
+    return await this.ngFireAuth.currentUser;
+  }
+  async sendPasswordResetEmail(email: string) {
+    return await this.ngFireAuth.sendPasswordResetEmail(email);
+  }
+}
+
+------------------------
+
+File: app/services/company.service.spec.ts
+import { TestBed } from '@angular/core/testing';
+
+import { CompanyService } from './company.service';
+
+describe('CompanyService', () => {
+  let service: CompanyService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(CompanyService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/services/company.service.ts
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CompanyService {
+
+  constructor() { }
+}
+
+------------------------
+
+File: app/services/data.service.spec.ts
+import { TestBed } from '@angular/core/testing';
+
+import { DataService } from './data.service';
+
+describe('DataService', () => {
+  let service: DataService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(DataService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/services/data.service.ts
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class DataService {
+  _data = [
+    {
+      interviewId: 1,
+      company: {
+        name: 'Acme Corporation',
+        location: 'New York, NY',
+        jobRole: 'Developer',
+      },
+      candidates: [
+        {
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          interviewSlot: {
+            date: '2023-06-15',
+            startTime: '09:00',
+            endTime: '10:00',
+          },
+        },
+        {
+          name: 'Jane Smith',
+          email: 'jane.smith@example.com',
+          interviewSlot: {
+            date: '2023-06-15',
+            startTime: '10:30',
+            endTime: '11:30',
+          },
+        },
+      ],
+    },
+    {
+      interviewId: 2,
+      company: {
+        name: 'Globex Corp',
+        location: 'San Francisco, CA',
+        jobRole: 'Developer',
+      },
+      candidates: [
+        {
+          name: 'Michael Johnson',
+          email: 'michael.johnson@example.com',
+          interviewSlot: {
+            date: '2023-06-20',
+            startTime: '14:00',
+            endTime: '15:00',
+          },
+        },
+        {
+          name: 'Emily Wilson',
+          email: 'emily.wilson@example.com',
+          interviewSlot: {
+            date: '2023-06-20',
+            startTime: '15:30',
+            endTime: '16:30',
+          },
+        },
+      ],
+    },
+    {
+      interviewId: 3,
+      company: {
+        name: 'TechGiant Inc.',
+        location: 'Seattle, WA',
+        jobRole: 'Engineering',
+      },
+      candidates: [
+        {
+          name: 'David Thompson',
+          email: 'david.thompson@example.com',
+          interviewSlot: {
+            date: '2023-06-22',
+            startTime: '10:00',
+            endTime: '11:30',
+          },
+        },
+        {
+          name: 'Samantha Lee',
+          email: 'samantha.lee@example.com',
+          interviewSlot: {
+            date: '2023-06-22',
+            startTime: '14:00',
+            endTime: '15:30',
+          },
+        },
+      ],
+    },
+    {
+      interviewId: 4,
+      company: {
+        name: 'Innovatech Solutions',
+        location: 'Boston, MA',
+        jobRole: 'Devops Development',
+      },
+      candidates: [
+        {
+          name: 'Robert Brown',
+          email: 'robert.brown@example.com',
+          interviewSlot: {
+            date: '2023-06-25',
+            startTime: '09:00',
+            endTime: '10:30',
+          },
+        },
+      ],
+    },
+    {
+      interviewId: 5,
+      company: {
+        name: 'CyberSec Corp',
+        location: 'San Diego, CA',
+        jobRole: 'Flutter Development Team Lead',
+      },
+      candidates: [
+        {
+          name: 'Jessica Garcia',
+          email: 'jessica.garcia@example.com',
+          interviewSlot: {
+            date: '2023-06-28',
+            startTime: '11:00',
+            endTime: '12:30',
+          },
+        },
+        {
+          name: 'Andrew Martinez',
+          email: 'andrew.martinez@example.com',
+          interviewSlot: {
+            date: '2023-06-28',
+            startTime: '14:30',
+            endTime: '16:00',
+          },
+        },
+      ],
+    },
+    {
+      interviewId: 6,
+      company: {
+        name: 'FinTech Innovations',
+        location: 'Chicago, IL',
+        jobRole: 'Flutter Developer',
+      },
+      candidates: [
+        {
+          name: 'Olivia Taylor',
+          email: 'olivia.taylor@example.com',
+          interviewSlot: {
+            date: '2023-06-30',
+            startTime: '10:00',
+            endTime: '11:30',
+          },
+        },
+        {
+          name: 'William Anderson',
+          email: 'william.anderson@example.com',
+          interviewSlot: {
+            date: '2023-06-30',
+            startTime: '14:00',
+            endTime: '15:30',
+          },
+        },
+      ],
+    },
+  ];
+
+  _interviewSchedule = [
+    {
+      interviewId: 1,
+      company: {
+        name: 'Acme Corporation',
+        location: 'New York, NY',
+      },
+      candidates: [
+        {
+          candidateId: 1,
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          interviewSlot: {
+            date: '2023-06-15',
+            startTime: '09:00',
+            endTime: '10:00',
+          },
+        },
+        {
+          candidateId: 2,
+          name: 'Jane Smith',
+          email: 'jane.smith@example.com',
+          interviewSlot: {
+            date: '2023-06-15',
+            startTime: '10:30',
+            endTime: '11:30',
+          },
+        },
+      ],
+    },
+    {
+      interviewId: 2,
+      company: {
+        name: 'Globex Corp',
+        location: 'San Francisco, CA',
+      },
+      candidates: [
+        {
+          candidateId: 3,
+          name: 'Michael Johnson',
+          email: 'michael.johnson@example.com',
+          interviewSlot: {
+            date: '2023-06-20',
+            startTime: '14:00',
+            endTime: '15:00',
+          },
+        },
+        {
+          candidateId: 4,
+          name: 'Emily Wilson',
+          email: 'emily.wilson@example.com',
+          interviewSlot: {
+            date: '2023-06-20',
+            startTime: '15:30',
+            endTime: '16:30',
+          },
+        },
+      ],
+    },
+  ];
+
+  get interveiewSchedule() {
+    return this._interviewSchedule;
+  }
+  get data() {
+    return this._data;
+  }
+  constructor() {}
+}
+
+------------------------
+
+File: app/services/user.service.spec.ts
+import { TestBed } from '@angular/core/testing';
+
+import { UserService } from './user.service';
+
+describe('UserService', () => {
+  let service: UserService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(UserService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/services/user.service.ts
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+
+  constructor() { }
+}
+
+------------------------
+
+File: app/tab1/tab1.page.html
+<ion-header collapse="condense">
+  <ion-toolbar>
+    <ion-title size="large">Dashborad</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Dashboard</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-datetime dayValues="5,10,15,20,25,30" class="ion-margin ion-margin-start"></ion-datetime>
+  <h2 class="ion-padding-start">Your Available Jobs</h2>
+  <ion-list>
+    <ion-card *ngFor="let job of data">
+      <ion-card-header>
+        <ion-card-title>{{ job.title }}</ion-card-title>
+        <ion-card-subtitle>{{ job.location}}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-list>
+          <ion-list-header>{{job.type}}</ion-list-header>
+          <ion-item>
+            <ion-label>
+              <h2>{{ job.description }}</h2>
+              <p>{{ job.salaryRange.min }}</p>
+              <button>Apply</button>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+</ion-content>
+------------------------
+
+File: app/tab1/tab1.page.scss
+
+------------------------
+
+File: app/tab1/tab1.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Tab1Page } from './tab1.page';
+
+describe('Tab1Page', () => {
+  let component: Tab1Page;
+  let fixture: ComponentFixture<Tab1Page>;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(Tab1Page);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/tab1/tab1.page.ts
+import { Component, OnInit } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { ExploreContainerComponent } from '../explore-container/explore-container.component';
+import { DataService } from '../services/data.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ApiService } from '../services/api.service';
+import { Company } from '../models/company';
+import { Job } from '../models/job';
+
+@Component({
+  selector: 'app-tab1',
+  templateUrl: 'tab1.page.html',
+  styleUrls: ['tab1.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
+})
+export class Tab1Page implements OnInit {
+  data?: Job[];
+  constructor(public dataService: DataService, public api: ApiService) {}
+  ngOnInit(): void {
+    this.api.getAllJobs().subscribe((company) => (this.data = company));
+  }
+}
+
+------------------------
+
+File: app/tab2/tab2.page.html
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Search For Job
+    </ion-title>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Search For Job</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-searchbar show-clear-button="focus" class="ion-padding"></ion-searchbar>
+  <ion-list>
+    <ion-item *ngFor="let company of data">
+      <ion-card class="company-card" style="width: 100%">
+        <ion-card-header>
+          <ion-card-title class="company-name">{{ company.company.name }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p class="company-location">{{ company.company.location }}</p>
+          <p class="company-location">{{ company.company.jobRole }}</p>
+        </ion-card-content>
+        <ion-ripple-effect></ion-ripple-effect>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
+------------------------
+
+File: app/tab2/tab2.page.scss
+.company-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transition: box-shadow 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.company-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.company-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #c2a2a2;
+    margin-bottom: 8px;
+}
+
+.company-location {
+    font-size: 16px;
+    color: #b3b3b3;
+}
+------------------------
+
+File: app/tab2/tab2.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Tab2Page } from './tab2.page';
+
+describe('Tab2Page', () => {
+  let component: Tab2Page;
+  let fixture: ComponentFixture<Tab2Page>;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(Tab2Page);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/tab2/tab2.page.ts
+import { Component, OnInit } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { DataService } from '../services/data.service';
+
+@Component({
+  selector: 'app-tab2',
+  templateUrl: 'tab2.page.html',
+  styleUrls: ['tab2.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule],
+})
+export class Tab2Page implements OnInit {
+  data: any;
+  constructor(public dataService: DataService) {}
+  ngOnInit(): void {
+    this.data = this.dataService.data;
+  }
+}
+
+------------------------
+
+File: app/tab3/tab3.page.html
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Interview Schedule</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngFor="let interview of interviewSchedule" class="interview-card">
+    <ion-card-header>
+      <ion-card-title>{{ interview.company.name }}</ion-card-title>
+      <ion-card-subtitle>{{ interview.company.location }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-list-header>Candidates</ion-list-header>
+        <ion-item *ngFor="let candidate of interview.candidates">
+          <ion-label>
+            <h2>{{ candidate.name }}</h2>
+            <p>{{ candidate.email }}</p>
+            <p>
+              <strong>Interview Date:</strong> {{ candidate.interviewSlot.date }}
+            </p>
+            <p>
+              <strong>Time:</strong>
+              {{ candidate.interviewSlot.startTime }} -
+              {{ candidate.interviewSlot.endTime }}
+            </p>
+            <ion-button color="primary" fill="outline">View
+              Candidate Details</ion-button>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+------------------------
+
+File: app/tab3/tab3.page.scss
+// ion-content {
+//     --background: #f5f5f5;
+// }
+
+.interview-card {
+    margin: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+
+    ion-card-header {
+        padding: 16px;
+        background-color: #3880ff;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    ion-card-content {
+        padding: 16px;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    ion-button {
+        margin-top: 16px;
+    }
+
+    &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+}
+------------------------
+
+File: app/tab3/tab3.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Tab3Page } from './tab3.page';
+
+describe('Tab3Page', () => {
+  let component: Tab3Page;
+  let fixture: ComponentFixture<Tab3Page>;
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(Tab3Page);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/tab3/tab3.page.ts
+import { Component, OnInit } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { ExploreContainerComponent } from '../explore-container/explore-container.component';
+import { CommonModule } from '@angular/common';
+import { DataService } from '../services/data.service';
+
+@Component({
+  selector: 'app-tab3',
+  templateUrl: 'tab3.page.html',
+  styleUrls: ['tab3.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule],
+})
+export class Tab3Page implements OnInit {
+  interviewSchedule: any;
+  constructor(public dataService: DataService) {}
+  ngOnInit(): void {
+    this.interviewSchedule = this.dataService.interveiewSchedule;
+  }
+}
+
+------------------------
+
+File: app/tab4/tab4.page.html
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Personal Information</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">Name</ion-label>
+          <ion-input [(ngModel)]="profile.name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input [(ngModel)]="profile.email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Contact Number</ion-label>
+          <ion-input [(ngModel)]="profile.contact"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Roll Number</ion-label>
+          <ion-input [(ngModel)]="profile.rollNumber"></ion-input>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Academic Details</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item-group>
+          <ion-item-divider>HSC</ion-item-divider>
+          <ion-item>
+            <ion-label position="stacked">College</ion-label>
+            <ion-input [(ngModel)]="profile.hsc.college"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Year of Passing</ion-label>
+            <ion-input type="number" [(ngModel)]="profile.hsc.yearOfPassing"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Total Marks</ion-label>
+            <ion-input type="number" [(ngModel)]="profile.hsc.totalMarks"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Out of Marks</ion-label>
+            <ion-input type="number" [(ngModel)]="profile.hsc.outOfMarks"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Percentage</ion-label>
+            <ion-note slot="end">{{ calculatePercentage(profile.hsc.totalMarks, profile.hsc.outOfMarks) }}%</ion-note>
+          </ion-item>
+        </ion-item-group>
+
+        <!-- Repeat the above structure for SSC details -->
+
+        <ion-item-group>
+          <ion-item-divider>Semester Marks</ion-item-divider>
+          <ion-item *ngFor="let semester of profile.semesterMarks; let i = index">
+            <ion-label>Semester {{ i + 1 }}</ion-label>
+            <ion-note slot="end">CGPA: {{ semester.cgpa }} | Percentage: {{ semester.percentage }}%</ion-note>
+          </ion-item>
+        </ion-item-group>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Additional Details</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">Resume</ion-label>
+          <ion-button (click)="viewResume()">View Resume</ion-button>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Additional Courses</ion-label>
+          <ion-textarea [(ngModel)]="profile.additionalCourses"></ion-textarea>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" (click)="saveProfile()">Save Changes</ion-button>
+</ion-content>
+------------------------
+
+File: app/tab4/tab4.page.scss
+ion-content {
+    --background: var(--ion-color-light);
+}
+
+ion-card {
+    margin: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    ion-card-header {
+        background-color: var(--ion-color-primary);
+        color: #fff;
+        padding: 16px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+
+        ion-card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+    }
+
+    ion-card-content {
+        padding: 16px;
+
+        ion-list {
+            ion-item {
+                --background: transparent;
+                --padding-start: 0;
+                --inner-padding-end: 0;
+
+                ion-label {
+                    font-size: 14px;
+                    color: var(--ion-color-medium);
+                }
+
+                ion-input,
+                ion-textarea {
+                    --padding-start: 8px;
+                    --padding-end: 8px;
+                    border: 1px solid var(--ion-color-medium);
+                    border-radius: 4px;
+                    font-size: 16px;
+                }
+
+                ion-button {
+                    --box-shadow: none;
+                }
+            }
+
+            ion-item-group {
+                margin-bottom: 16px;
+
+                ion-item-divider {
+                    --background: var(--ion-color-primary);
+                    --color: #fff;
+                    font-weight: 500;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                }
+            }
+        }
+    }
+}
+
+ion-button {
+    --background: var(--ion-color-primary);
+    --color: #fff;
+    --border-radius: 4px;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 16px;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+------------------------
+
+File: app/tab4/tab4.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Tab4Page } from './tab4.page';
+
+describe('Tab4Page', () => {
+  let component: Tab4Page;
+  let fixture: ComponentFixture<Tab4Page>;
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(Tab4Page);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/tab4/tab4.page.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
+
+@Component({
+  selector: 'app-tab4',
+  templateUrl: './tab4.page.html',
+  styleUrls: ['./tab4.page.scss'],
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule],
+})
+export class Tab4Page implements OnInit {
+  profile = {
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    contact: '1234567890',
+    rollNumber: 'ABC123',
+    hsc: {
+      college: 'ABC High School',
+      yearOfPassing: 2018,
+      totalMarks: 480,
+      outOfMarks: 500,
+    },
+    ssc: {
+      college: 'XYZ Secondary School',
+      yearOfPassing: 2016,
+      totalMarks: 550,
+      outOfMarks: 600,
+    },
+    semesterMarks: [
+      {
+        cgpa: 8.5,
+        percentage: 85,
+      },
+      {
+        cgpa: 9.2,
+        percentage: 92,
+      },
+      {
+        cgpa: 8.7,
+        percentage: 87,
+      },
+      {
+        cgpa: 9.1,
+        percentage: 91,
+      },
+      {
+        cgpa: 8.9,
+        percentage: 89,
+      },
+    ],
+    resume: 'path/to/resume.pdf',
+    additionalCourses: 'Course 1, Course 2',
+  };
+  constructor() {}
+
+  ngOnInit() {}
+  viewResume() {}
+  calculatePercentage(marks: any, outof: any) {}
+  saveProfile() {}
+}
+
+------------------------
+
+File: app/tabs/tabs.page.html
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="tab1" href="/tabs/tab1">
+      <ion-icon aria-hidden="true" name="home-outline"></ion-icon>
+      <ion-label>Dashboard</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="tab2" href="/tabs/tab2">
+      <ion-icon aria-hidden="true" name="search-outline"></ion-icon>
+      <ion-label>Search</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="tab3" href="/tabs/tab3">
+      <ion-icon aria-hidden="true" name="desktop-outline"></ion-icon>
+      <ion-label>Interviews</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="tab4" href="/tabs/tab4">
+      <ion-icon aria-hidden="true" name="person-outline"></ion-icon>
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+------------------------
+
+File: app/tabs/tabs.page.scss
+
+
+------------------------
+
+File: app/tabs/tabs.page.spec.ts
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+
+import { TabsPage } from './tabs.page';
+
+describe('TabsPage', () => {
+  let component: TabsPage;
+  let fixture: ComponentFixture<TabsPage>;
+
+  beforeEach(async () => {
+    TestBed.overrideComponent(TabsPage, {
+      add: {
+        imports: [RouterTestingModule]
+      }
+    });
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TabsPage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+------------------------
+
+File: app/tabs/tabs.page.ts
+import { Component, EnvironmentInjector, inject } from '@angular/core';
+import {
+  IonTabs,
+  IonTabBar,
+  IonTabButton,
+  IonIcon,
+  IonLabel,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  homeOutline,
+  searchOutline,
+  desktopOutline,
+  personOutline,
+} from 'ionicons/icons';
+
+@Component({
+  selector: 'app-tabs',
+  templateUrl: 'tabs.page.html',
+  styleUrls: ['tabs.page.scss'],
+  standalone: true,
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+})
+export class TabsPage {
+  public environmentInjector = inject(EnvironmentInjector);
+
+  constructor() {
+    addIcons({ homeOutline, searchOutline, desktopOutline, personOutline });
+  }
+}
+
+------------------------
+
+File: app/tabs/tabs.routes.ts
+import { Routes } from '@angular/router';
+import { TabsPage } from './tabs.page';
+
+export const routes: Routes = [
+  {
+    path: '',
+    component: TabsPage,
+    children: [
+      {
+        path: 'tab1',
+        loadComponent: () =>
+          import('../tab1/tab1.page').then((m) => m.Tab1Page),
+      },
+      {
+        path: 'tab2',
+        loadComponent: () =>
+          import('../tab2/tab2.page').then((m) => m.Tab2Page),
+      },
+      {
+        path: 'tab3',
+        loadComponent: () =>
+          import('../tab3/tab3.page').then((m) => m.Tab3Page),
+      },
+      {
+        path: '',
+        redirectTo: '/tabs/tab1',
+        pathMatch: 'full',
+      },
+      {
+        path: 'tab4',
+        loadComponent: () =>
+          import('../tab4/tab4.page').then((m) => m.Tab4Page),
+      },
+    ],
+  },
+  {
+    path: '',
+    redirectTo: '/tabs/tab1',
+    pathMatch: 'full',
+  },
+];
+
+------------------------
+

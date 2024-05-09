@@ -1,16 +1,19 @@
-import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
-import { ExploreContainerComponent } from '../explore-container/explore-container.component';
+import { Component, OnInit } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent]
+  imports: [IonicModule, CommonModule],
 })
-export class Tab2Page {
-
-  constructor() {}
-
+export class Tab2Page implements OnInit {
+  data: any;
+  constructor(public dataService: DataService) {}
+  ngOnInit(): void {
+    this.data = this.dataService.data;
+  }
 }

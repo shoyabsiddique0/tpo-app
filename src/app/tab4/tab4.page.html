@@ -1,0 +1,96 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Personal Information</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">Name</ion-label>
+          <ion-input [(ngModel)]="profile.name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input [(ngModel)]="profile.email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Contact Number</ion-label>
+          <ion-input [(ngModel)]="profile.contact"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Roll Number</ion-label>
+          <ion-input [(ngModel)]="profile.rollNumber"></ion-input>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Academic Details</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item-group>
+          <ion-item-divider>HSC</ion-item-divider>
+          <ion-item>
+            <ion-label position="stacked">College</ion-label>
+            <ion-input [(ngModel)]="profile.hsc.college"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Year of Passing</ion-label>
+            <ion-input type="number" [(ngModel)]="profile.hsc.yearOfPassing"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Total Marks</ion-label>
+            <ion-input type="number" [(ngModel)]="profile.hsc.totalMarks"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Out of Marks</ion-label>
+            <ion-input type="number" [(ngModel)]="profile.hsc.outOfMarks"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Percentage</ion-label>
+            <ion-note slot="end">{{ calculatePercentage(profile.hsc.totalMarks, profile.hsc.outOfMarks) }}%</ion-note>
+          </ion-item>
+        </ion-item-group>
+
+        <!-- Repeat the above structure for SSC details -->
+
+        <ion-item-group>
+          <ion-item-divider>Semester Marks</ion-item-divider>
+          <ion-item *ngFor="let semester of profile.semesterMarks; let i = index">
+            <ion-label>Semester {{ i + 1 }}</ion-label>
+            <ion-note slot="end">CGPA: {{ semester.cgpa }} | Percentage: {{ semester.percentage }}%</ion-note>
+          </ion-item>
+        </ion-item-group>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Additional Details</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">Resume</ion-label>
+          <ion-button (click)="viewResume()">View Resume</ion-button>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Additional Courses</ion-label>
+          <ion-textarea [(ngModel)]="profile.additionalCourses"></ion-textarea>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" (click)="saveProfile()">Save Changes</ion-button>
+</ion-content>

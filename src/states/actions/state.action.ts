@@ -1,0 +1,7 @@
+import { createAction } from '@ngrx/store';
+
+export const register = createAction('register');
+
+export const login = createAction('login');
+
+export const logout = createAction('logout');

@@ -1,17 +1,35 @@
-<ion-header [translucent]="true">
+<ion-header collapse="condense">
   <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
+    <ion-title size="large">Dashborad</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Dashboard</ion-title>
     </ion-toolbar>
   </ion-header>
+  <ion-datetime dayValues="5,10,15,20,25,30" class="ion-margin ion-margin-start"></ion-datetime>
+  <h2 class="ion-padding-start">Your Available Jobs</h2>
+  <ion-list>
+    <ion-card *ngFor="let job of data">
+      <ion-card-header>
+        <ion-card-title>{{ job.title }}</ion-card-title>
+        <ion-card-subtitle>{{ job.location}}</ion-card-subtitle>
+      </ion-card-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+      <ion-card-content>
+        <ion-list>
+          <ion-list-header>{{job.type}}</ion-list-header>
+          <ion-item>
+            <ion-label>
+              <h2>{{ job.description }}</h2>
+              <p>{{ job.salaryRange.min }}</p>
+              <button>Apply</button>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
 </ion-content>

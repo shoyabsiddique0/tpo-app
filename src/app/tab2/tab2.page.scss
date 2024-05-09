@@ -1,0 +1,22 @@
+.company-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transition: box-shadow 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.company-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.company-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #c2a2a2;
+    margin-bottom: 8px;
+}
+
+.company-location {
+    font-size: 16px;
+    color: #b3b3b3;
+}
